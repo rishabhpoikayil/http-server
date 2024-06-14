@@ -14,17 +14,27 @@ def main():
         print(f"Request received:\n{req}")
 
         # Parsing HTTP request to get the request line
-        request_line = req.split("\r\n")[0]
-        method, path, version = request_line.split()
+        http_request = req.split("\r\n")
+        request_line = http_request[0]
+        method, path, http_version = request_line.split()
 
         # Checking the request path and sending the appropriate response
         if path == "/":
             response = b"HTTP/1.1 200 OK\r\n\r\n"
+
         elif path.startswith("/echo/"):
             # Extracting response string to be sent back
             echo_string = path[len(b"/echo/"):]
             if echo_string.isalnum():
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
+
+        elif path.startswith("/user-agent"):
+            # Reading user agent header
+            for line in http_request[1:]:
+                if line.startswith("User-Agent:"):
+                    user_agent_res = line.split(":", 1)[1].strip()
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent_res)}\r\n\r\n{user_agent_res}".encode()
+
         else:
             response = b"HTTP/1.1 404 Not Found\r\n\r\n"
 
