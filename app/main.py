@@ -55,7 +55,7 @@ def handle_client(client_socket):
             post_data_index = req.find("\r\n\r\n") + 4
             post_data = req[post_data_index:]
             with open(file_path, "w") as f:
-                f.write(post_data.encode())
+                f.write(post_data)
 
             response = f"HTTP/1.1 201 Created\r\n\r\n"
 
