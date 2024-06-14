@@ -14,14 +14,16 @@ def main():
         print(f"Request received:\n{req}")
 
         # Parsing HTTP request to get the request line
-        request_line = req.split("\r\n")[0]
+        request_line = req.split(b"\r\n")[0]
         method, path, version = request_line.split()
 
+        # Checking the request path and sending the appropriate response
         if path == '/':
-            client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+            response = b"HTTP/1.1 200 OK\r\n\r\n"
         else:
-            client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
-        
+            response = b"HTTP/1.1 404 Not Found\r\n\r\n"
+
+        client_socket.sendall(response)
         client_socket.close()
 
 if __name__ == "__main__":
