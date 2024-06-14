@@ -35,8 +35,8 @@ def handle_client(client_socket):
 
             if echo_string.isalnum():
                 if "gzip" in encodings_list:
-                    comp_echo_string = gzip.compress(echo_string)
-                    response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(comp_echo_string)}\r\n\r\n{comp_echo_string}".encode()
+                    comp_echo_string = gzip.compress(echo_string.encode())
+                    response = b"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: " + len(comp_echo_string) + "\r\n\r\n" + comp_echo_string
                 else:
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
 
