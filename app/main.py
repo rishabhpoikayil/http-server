@@ -42,7 +42,6 @@ def handle_client(client_socket):
         else:
             response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
-
     else:
         response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
@@ -53,8 +52,9 @@ def main():
     global FILES_DIRECTORY
 
     # Parsing command line arguments for dealing with files
-    if sys.argv[1] == "--directory":
-        FILES_DIRECTORY = sys.argv[2]
+    if len(sys.argv) > 2:
+        if sys.argv[1] == "--directory":
+            FILES_DIRECTORY = sys.argv[2]
     
     addr = ("localhost", 4221)
     server_socket = socket.create_server(addr, reuse_port=True)
