@@ -10,16 +10,21 @@ def main():
         print(f"Connection from {client_address}")
 
         # Reading the request sent by the client
-        req = client_socket.recv(1024)
+        req = client_socket.recv(1024).decode()
         print(f"Request received:\n{req}")
 
         # Parsing HTTP request to get the request line
-        request_line = req.split(b"\r\n")[0]
+        request_line = req.split("\r\n")[0]
         method, path, version = request_line.split()
 
         # Checking the request path and sending the appropriate response
-        if path == b"/":
+        if path == "/":
             response = b"HTTP/1.1 200 OK\r\n\r\n"
+        elif path.startswith("/echo/"):
+            # Extracting response string to be sent back
+            echo_string = path[len(b"/echo/"):]
+            if echo_string.isalnum():
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
         else:
             response = b"HTTP/1.1 404 Not Found\r\n\r\n"
 
