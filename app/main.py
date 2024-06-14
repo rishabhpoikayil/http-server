@@ -15,6 +15,7 @@ def main():
 
         # Parsing HTTP request to get the request line
         http_request = req.split("\r\n")
+        print(f"http_request:\n{http_request}")
         request_line = http_request[0]
         method, path, http_version = request_line.split()
 
