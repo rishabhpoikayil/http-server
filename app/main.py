@@ -23,19 +23,18 @@ def handle_client(client_socket):
             echo_string = path[len("/echo/"):]
 
             # Support for content-encoding header
-            encoding_type = ""
+            encodings_list = ""
             for line in http_request[1:]:
                 if line.lower().startswith("accept-encoding:"):
-                    encoding_type = line.split(":", 1)[1].strip()
+                    encodings_str = line.split(":", 1)[1].strip()
+                    encodings_list= encodings_str.split(", ")
 
             if echo_string.isalnum():
-                if len(encoding_type) != 0 and encoding_type == "gzip":
-                    response = f"HTTP/1.1 200 OK\r\nContent-Encoding: {encoding_type}\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
+                if "gzip" in encodings_list:
+                    response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
                 else:
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
 
-            # if echo_string.isalnum():
-            #     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
 
         elif path.startswith("/user-agent"):
             # Reading user agent header
@@ -43,6 +42,7 @@ def handle_client(client_socket):
                 if line.lower().startswith("user-agent:"):
                     user_agent_res = line.split(":", 1)[1].strip()
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent_res)}\r\n\r\n{user_agent_res}".encode()
+
 
         elif path.startswith("/files/"):
             filename = path[len("/files/"):]
@@ -55,6 +55,7 @@ def handle_client(client_socket):
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
             else:
                 response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
+
 
         else:
             response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
