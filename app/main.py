@@ -23,6 +23,7 @@ def handle_client(client_socket):
             echo_string = path[len("/echo/"):]
 
             # Support for content-encoding header
+            encoding_type = ""
             for line in http_request[1:]:
                 if line.lower().startswith("accept-encoding:"):
                     encoding_type = line.split(":", 1)[1].strip()
