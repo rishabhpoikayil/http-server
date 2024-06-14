@@ -1,5 +1,7 @@
 import socket
 import threading
+import os
+import sys
 
 def handle_client(client_socket):
     # Reading the request sent by the client
@@ -17,7 +19,7 @@ def handle_client(client_socket):
 
     elif path.startswith("/echo/"):
         # Extracting response string to be sent back
-        echo_string = path[len(b"/echo/"):]
+        echo_string = path[len("/echo/"):]
         if echo_string.isalnum():
             response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
 
@@ -28,6 +30,17 @@ def handle_client(client_socket):
                 user_agent_res = line.split(":", 1)[1].strip()
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent_res)}\r\n\r\n{user_agent_res}".encode()
 
+    elif path.startswith("/files/"):
+        filename = path[len("/files/"):]
+        file_path = os.path.join(FILES_DIRECTORY, filename)
+
+        # Check if file exists -> if true, read its contents
+        if os.path.isfile(file_path):
+            with open(file_path, "rb") as f:
+                content = f.read()
+
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}"
+
     else:
         response = b"HTTP/1.1 404 Not Found\r\n\r\n"
 
@@ -35,6 +48,12 @@ def handle_client(client_socket):
     client_socket.close()
 
 def main():
+    global FILES_DIRECTORY
+
+    # Parsing command line arguments for dealing with files
+    if sys.argv[1] == "--directory":
+        FILES_DIRECTORY = sys.argv[2]
+    
     addr = ("localhost", 4221)
     server_socket = socket.create_server(addr, reuse_port=True)
     print("Server is listening on localhost:4221")
@@ -43,7 +62,7 @@ def main():
         client_socket, client_address = server_socket.accept()
         print(f"Connection from {client_address}")
 
-        # Starting new threads to handle the client connection
+        # Starting new threads to handle multiple clients if needed
         client_thread = threading.Thread(target=handle_client, args=(client_socket,))
         client_thread.start()
 
