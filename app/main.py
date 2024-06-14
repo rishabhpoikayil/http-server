@@ -7,9 +7,22 @@ def main():
 
     while True:
         client_socket, client_address = server_socket.accept()
-        print(f"Connection from {client_address}{client_socket}")
-        client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
-        # client_socket.close()
+        print(f"Connection from {client_address}")
+
+        # Reading the request sent by the client
+        req = client_socket.recv(1024)
+        print(f"Request received:\n{req}")
+
+        # Parsing HTTP request to get the request line
+        request_line = req.split("\r\n")[0]
+        method, path, version = request_line.split()
+
+        if path == '/':
+            client_socket.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+        else:
+            client_socket.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+        
+        client_socket.close()
 
 if __name__ == "__main__":
     main()
