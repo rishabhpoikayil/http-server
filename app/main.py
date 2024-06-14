@@ -21,13 +21,25 @@ def handle_client(client_socket):
         elif path.startswith("/echo/"):
             # Extracting response string to be sent back
             echo_string = path[len("/echo/"):]
+
+            # Support for content-encoding header
+            for line in http_request[1:]:
+                if line.lower().startswith("accept-encoding:"):
+                    encoding_type = line.split(":", 1)[1].strip()
+
             if echo_string.isalnum():
-                response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
+                if encoding_type:
+                    response = f"HTTP/1.1 200 OK\r\nContent-Encoding: {encoding_type}\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
+                else:
+                    response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
+
+            # if echo_string.isalnum():
+            #     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
 
         elif path.startswith("/user-agent"):
             # Reading user agent header
             for line in http_request[1:]:
-                if line.startswith("User-Agent:"):
+                if line.lower().startswith("user-agent:"):
                     user_agent_res = line.split(":", 1)[1].strip()
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent_res)}\r\n\r\n{user_agent_res}".encode()
 
