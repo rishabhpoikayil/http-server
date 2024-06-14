@@ -15,7 +15,7 @@ def handle_client(client_socket):
 
     # Checking the request path and sending the appropriate response
     if path == "/":
-        response = b"HTTP/1.1 200 OK\r\n\r\n"
+        response = f"HTTP/1.1 200 OK\r\n\r\n".encode()
 
     elif path.startswith("/echo/"):
         # Extracting response string to be sent back
@@ -36,13 +36,15 @@ def handle_client(client_socket):
 
         # Check if file exists -> if true, read its contents
         if os.path.isfile(file_path):
-            with open(file_path, "rb") as f:
+            with open(file_path, "r") as f:
                 content = f.read()
-
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
+        else:
+            response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
+
 
     else:
-        response = b"HTTP/1.1 404 Not Found\r\n\r\n"
+        response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
     client_socket.sendall(response)
     client_socket.close()
