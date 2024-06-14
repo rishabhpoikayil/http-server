@@ -16,7 +16,7 @@ def main():
         # Parsing HTTP request to get the request line
         request_line = req.split(b"\r\n")[0]
         method, path, version = request_line.split()
-        print(f"path"{path})
+        print(f"path:{path}")
 
         # Checking the request path and sending the appropriate response
         if path == '/':
