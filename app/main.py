@@ -16,10 +16,9 @@ def main():
         # Parsing HTTP request to get the request line
         request_line = req.split(b"\r\n")[0]
         method, path, version = request_line.split()
-        print(f"path:{path}")
 
         # Checking the request path and sending the appropriate response
-        if path == '/':
+        if path == b"/":
             response = b"HTTP/1.1 200 OK\r\n\r\n"
         else:
             response = b"HTTP/1.1 404 Not Found\r\n\r\n"
