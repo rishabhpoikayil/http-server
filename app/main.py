@@ -1,3 +1,5 @@
+# HTTP SERVER CODE W/ COMPRESSION
+
 import socket
 import threading
 import os
