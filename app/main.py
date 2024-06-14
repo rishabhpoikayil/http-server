@@ -57,7 +57,7 @@ def handle_client(client_socket):
             with open(file_path, "w") as f:
                 f.write(post_data)
 
-            response = f"HTTP/1.1 201 Created\r\n\r\n"
+            response = f"HTTP/1.1 201 Created\r\n\r\n".encode()
 
     client_socket.sendall(response)
     client_socket.close()
