@@ -2,6 +2,9 @@ import socket
 import threading
 import os
 import sys
+import gzip # for HTTP compression
+
+####################################################################################
 
 def handle_client(client_socket):
     # Reading the request sent by the client
@@ -18,6 +21,7 @@ def handle_client(client_socket):
         if path == "/":
             response = f"HTTP/1.1 200 OK\r\n\r\n".encode()
 
+
         elif path.startswith("/echo/"):
             # Extracting response string to be sent back
             echo_string = path[len("/echo/"):]
@@ -27,10 +31,11 @@ def handle_client(client_socket):
             for line in http_request[1:]:
                 if line.lower().startswith("accept-encoding:"):
                     encodings_str = line.split(":", 1)[1].strip()
-                    encodings_list= encodings_str.split(", ")
+                    encodings_list = encodings_str.split(", ")
 
             if echo_string.isalnum():
                 if "gzip" in encodings_list:
+                    echo_string = gzip.compress(echo_string)
                     response = f"HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
                 else:
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(echo_string)}\r\n\r\n{echo_string}".encode()
@@ -60,6 +65,7 @@ def handle_client(client_socket):
         else:
             response = f"HTTP/1.1 404 Not Found\r\n\r\n".encode()
 
+
     if method == "POST":
         if path.startswith("/files/"):
             filename = path[len("/files/"):]
@@ -73,9 +79,11 @@ def handle_client(client_socket):
 
             response = f"HTTP/1.1 201 Created\r\n\r\n".encode()
 
+
     client_socket.sendall(response)
     client_socket.close()
 
+####################################################################################
 
 def main():
     global FILES_DIRECTORY
